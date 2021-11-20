@@ -38,7 +38,7 @@ func TestRenderVideo(t *testing.T) {
 				IsVideo:    true,
 				Preload:    Auto,
 				Sources:    Sources{{"example.org", "mp4"}},
-			}, "<video controls autoplay loop muted><source src=\"example.org\" type=\"mp4\"></video>",
+			}, "<video controls autoplay loop muted preload=\"auto\"><source src=\"example.org\" type=\"mp4\"></video>",
 		}, {
 			Media{ //full audio
 				BaseInline: ast.BaseInline{},
@@ -49,7 +49,7 @@ func TestRenderVideo(t *testing.T) {
 				IsVideo:    false,
 				Preload:    Auto,
 				Sources:    Sources{{"example.org", "mp4"}},
-			}, "<audio controls autoplay loop muted><source src=\"example.org\" type=\"mp4\"></audio>",
+			}, "<audio controls autoplay loop muted preload=\"auto\"><source src=\"example.org\" type=\"mp4\"></audio>",
 		},
 	}
 

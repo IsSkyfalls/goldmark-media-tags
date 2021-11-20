@@ -76,6 +76,9 @@ func renderMedia(writer util.BufWriter, source []byte, n ast.Node, entering bool
 		if v.Muted {
 			_, _ = writer.WriteString(" muted")
 		}
+		if v.Preload != "" {
+			_, _ = writer.WriteString(" preload=\"" + v.Preload + "\"")
+		}
 		_, _ = writer.WriteString(">")
 
 		//<source> tags
