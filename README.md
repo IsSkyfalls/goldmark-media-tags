@@ -1,4 +1,5 @@
 # goldmark-media-tags
+[![Go Reference](https://pkg.go.dev/badge/github.com/IsSkyfalls/goldmark-media-tags.svg)](https://pkg.go.dev/github.com/IsSkyfalls/goldmark-media-tags)
 
 A media tags extension for [GoldMark](https://github.com/yuin/goldmark/).
 
