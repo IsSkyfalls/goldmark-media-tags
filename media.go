@@ -15,16 +15,24 @@ func MediaKind() ast.NodeKind {
 	return kindMedia
 }
 
+type Type byte
+
+const (
+	Video   Type = 'v'
+	Audio   Type = 'a'
+	Picture Type = 'p'
+)
+
 // Media represents an inline <video> or <audio> node in the ast
 type Media struct {
 	ast.BaseInline
-	Controls bool
-	Autoplay bool
-	Loop     bool
-	Muted    bool
-	Preload  string
-	IsVideo  bool
-	Sources  Sources
+	Controls  bool
+	Autoplay  bool
+	Loop      bool
+	Muted     bool
+	Preload   string
+	MediaType Type
+	Sources   Sources
 }
 
 // Kind implements Node.Kind
@@ -44,6 +52,10 @@ func (n *Media) Dump(source []byte, level int) {
 	}, nil)
 }
 
+func (n Media) Playable() bool {
+	return n.MediaType == Video || n.MediaType == Audio
+}
+
 // mediaHTMLRenderer implements rendering for Media nodes
 type mediaHTMLRenderer struct {
 }
@@ -57,28 +69,32 @@ func renderMedia(writer util.BufWriter, source []byte, n ast.Node, entering bool
 	if entering {
 		v := n.(*Media)
 
-		//opening
-		if v.IsVideo {
+		switch v.MediaType {
+		case Video:
 			_, _ = writer.WriteString("<video")
-		} else {
+		case Audio:
 			_, _ = writer.WriteString("<audio")
+		case Picture:
+			_, _ = writer.WriteString("<picture")
+		}
+		if v.Playable() {
+			if v.Controls {
+				_, _ = writer.WriteString(" controls")
+			}
+			if v.Autoplay {
+				_, _ = writer.WriteString(" autoplay")
+			}
+			if v.Loop {
+				_, _ = writer.WriteString(" loop")
+			}
+			if v.Muted {
+				_, _ = writer.WriteString(" muted")
+			}
+			if v.Preload != "" {
+				_, _ = writer.WriteString(" preload=\"" + v.Preload + "\"")
+			}
 		}
 
-		if v.Controls {
-			_, _ = writer.WriteString(" controls")
-		}
-		if v.Autoplay {
-			_, _ = writer.WriteString(" autoplay")
-		}
-		if v.Loop {
-			_, _ = writer.WriteString(" loop")
-		}
-		if v.Muted {
-			_, _ = writer.WriteString(" muted")
-		}
-		if v.Preload != "" {
-			_, _ = writer.WriteString(" preload=\"" + v.Preload + "\"")
-		}
 		_, _ = writer.WriteString(">")
 
 		//<source> tags
@@ -86,10 +102,13 @@ func renderMedia(writer util.BufWriter, source []byte, n ast.Node, entering bool
 			s.writeHTMLTag(writer)
 		}
 		//closing
-		if v.IsVideo {
+		switch v.MediaType {
+		case Video:
 			_, _ = writer.WriteString("</video>")
-		} else {
+		case Audio:
 			_, _ = writer.WriteString("</audio>")
+		case Picture:
+			_, _ = writer.WriteString("</picture>")
 		}
 	}
 	//should not have any children

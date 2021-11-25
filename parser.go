@@ -7,11 +7,6 @@ import (
 	"regexp"
 )
 
-const (
-	video = 'v'
-	audio = 'a'
-)
-
 var regex = regexp.MustCompile(`!(.)\[(.*?)]\((.+?)\)`)
 
 // mediaParser implements parser.InlineParser interface
@@ -26,10 +21,10 @@ func (p mediaParser) Trigger() []byte {
 func (p mediaParser) Parse(parent ast.Node, block text.Reader, pc parser.Context) ast.Node {
 	match := block.FindSubMatch(regex)
 	if len(match) > 0 {
-		flag := match[1][0] // one character only
+		flag := (Type)(match[1][0]) // one character only
 		//alt := string(match[2])
 		url := string(match[3])
-		if flag == video || flag == audio {
+		if flag == Video || flag == Audio || flag == Picture {
 			return &Media{
 				BaseInline: ast.BaseInline{},
 				Controls:   p.MediaControls,
@@ -37,7 +32,7 @@ func (p mediaParser) Parse(parent ast.Node, block text.Reader, pc parser.Context
 				Loop:       p.MediaLoop,
 				Preload:    p.MediaPreload,
 				Muted:      p.MediaMuted,
-				IsVideo:    flag == video,
+				MediaType:  flag,
 				Sources: []Source{{
 					Src:  url,
 					Type: "",

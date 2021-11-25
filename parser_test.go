@@ -36,7 +36,7 @@ func TestParsePreserve(t *testing.T) {
 		pre   string
 		after string
 	}{
-		{"pre!v[video](h)after", "pre", "after"},
+		{"pre!v[Video](h)after", "pre", "after"},
 		{"pre!v[](h)after", "pre", "after"},    // no alt text, valid
 		{"pre!v[]()after", "pre!v", "after"},   // no url, should be handled as Link
 		{"pre!x[1](1)after", "pre!x", "after"}, // invalid, should be handled as Link

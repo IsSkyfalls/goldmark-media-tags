@@ -18,35 +18,35 @@ func TestRenderVideo(t *testing.T) {
 		{
 			Media{ //bare minimum video
 				BaseInline: ast.BaseInline{},
-				IsVideo:    true,
+				MediaType:  Video,
 				Sources:    Sources{{"example.org", "", "", "", ""}},
 			}, "<video><source src=\"example.org\"></video>",
 		},
 		{
-			Media{ //bare minimum audio
+			Media{ //bare minimum Audio
 				BaseInline: ast.BaseInline{},
-				IsVideo:    false,
+				MediaType:  Audio,
 				Sources:    Sources{{"example.org", "", "", "", ""}},
 			}, "<audio><source src=\"example.org\"></audio>",
 		}, {
-			Media{ //full video
+			Media{ //full Video
 				BaseInline: ast.BaseInline{},
 				Controls:   true,
 				Autoplay:   true,
 				Loop:       true,
 				Muted:      true,
-				IsVideo:    true,
+				MediaType:  Video,
 				Preload:    Auto,
 				Sources:    Sources{{"example.org", "(max-width:480px)", "", "mp4", ""}},
 			}, "<video controls autoplay loop muted preload=\"auto\"><source media=\"(max-width:480px)\" src=\"example.org\" type=\"mp4\"></video>",
 		}, {
-			Media{ //full audio
+			Media{ //full Audio
 				BaseInline: ast.BaseInline{},
 				Controls:   true,
 				Autoplay:   true,
 				Loop:       true,
 				Muted:      true,
-				IsVideo:    false,
+				MediaType:  Audio,
 				Preload:    Auto,
 				Sources:    Sources{{"example.org", "", "", "mp3", ""}},
 			}, "<audio controls autoplay loop muted preload=\"auto\"><source src=\"example.org\" type=\"mp3\"></audio>",
