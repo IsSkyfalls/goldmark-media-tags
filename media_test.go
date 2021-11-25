@@ -19,14 +19,14 @@ func TestRenderVideo(t *testing.T) {
 			Media{ //bare minimum video
 				BaseInline: ast.BaseInline{},
 				IsVideo:    true,
-				Sources:    Sources{{"example.org", ""}},
+				Sources:    Sources{{"example.org", "", "", "", ""}},
 			}, "<video><source src=\"example.org\"></video>",
 		},
 		{
 			Media{ //bare minimum audio
 				BaseInline: ast.BaseInline{},
 				IsVideo:    false,
-				Sources:    Sources{{"example.org", ""}},
+				Sources:    Sources{{"example.org", "", "", "", ""}},
 			}, "<audio><source src=\"example.org\"></audio>",
 		}, {
 			Media{ //full video
@@ -37,8 +37,8 @@ func TestRenderVideo(t *testing.T) {
 				Muted:      true,
 				IsVideo:    true,
 				Preload:    Auto,
-				Sources:    Sources{{"example.org", "mp4"}},
-			}, "<video controls autoplay loop muted preload=\"auto\"><source src=\"example.org\" type=\"mp4\"></video>",
+				Sources:    Sources{{"example.org", "(max-width:480px)", "", "mp4", ""}},
+			}, "<video controls autoplay loop muted preload=\"auto\"><source media=\"(max-width:480px)\" src=\"example.org\" type=\"mp4\"></video>",
 		}, {
 			Media{ //full audio
 				BaseInline: ast.BaseInline{},
@@ -48,8 +48,8 @@ func TestRenderVideo(t *testing.T) {
 				Muted:      true,
 				IsVideo:    false,
 				Preload:    Auto,
-				Sources:    Sources{{"example.org", "mp4"}},
-			}, "<audio controls autoplay loop muted preload=\"auto\"><source src=\"example.org\" type=\"mp4\"></audio>",
+				Sources:    Sources{{"example.org", "", "", "mp3", ""}},
+			}, "<audio controls autoplay loop muted preload=\"auto\"><source src=\"example.org\" type=\"mp3\"></audio>",
 		},
 	}
 

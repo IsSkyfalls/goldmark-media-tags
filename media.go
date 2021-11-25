@@ -97,9 +97,13 @@ func renderMedia(writer util.BufWriter, source []byte, n ast.Node, entering bool
 }
 
 // Source represents the <source> element
+// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/source#attributes
 type Source struct {
-	Src  string
-	Type string
+	Src    string
+	Media  string
+	Sizes  string
+	Type   string
+	SrcSet string
 }
 
 type Sources []Source
@@ -113,7 +117,19 @@ func (s Sources) String() string {
 }
 
 func (s Source) writeHTMLTag(writer util.BufWriter) {
-	_, _ = writer.WriteString("<source src=\"" + s.Src + "\"")
+	_, _ = writer.WriteString("<source")
+	if s.Media != "" {
+		_, _ = writer.WriteString(" media=\"" + s.Media + "\"")
+	}
+	if s.Sizes != "" {
+		_, _ = writer.WriteString(" sizes=\"" + s.Sizes + "\"")
+	}
+	if s.Src != "" {
+		_, _ = writer.WriteString(" src=\"" + s.Src + "\"")
+	}
+	if s.SrcSet != "" {
+		_, _ = writer.WriteString(" srcset=\"" + s.SrcSet + "\"")
+	}
 	if s.Type != "" {
 		_, _ = writer.WriteString(" type=\"" + s.Type + "\"")
 	}
