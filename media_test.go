@@ -71,11 +71,11 @@ func TestRender(t *testing.T) {
 				// VALID
 				Alt:       "IMAGE_ALT",
 				MediaType: Picture,
-				Sources: Sources{
-					{"example1.org", "VALID_SIZE", "image/png", "VALID_SRCSET", "VALID_MEDIA", false},
-					{"example2.org", "VALID_SIZE", "image/png", "VALID_SRCSET", "VALID_MEDIA", true},
+				Sources: Sources{ //should be flipped in final render
+					{"default.org", "VALID_SIZE", "image/png", "VALID_SRCSET", "VALID_MEDIA", true},
+					{"not-default.org", "VALID_SIZE", "image/png", "VALID_SRCSET", "VALID_MEDIA", false},
 				},
-			}, "<picture><source src=\"example1.org\" type=\"image/png\" media=\"VALID_MEDIA\" sizes=\"VALID_SIZE\" srcset=\"VALID_SRCSET\"><img alt=\"IMAGE_ALT\" src=\"example2.org\" type=\"image/png\" media=\"VALID_MEDIA\" sizes=\"VALID_SIZE\" srcset=\"VALID_SRCSET\"></picture>",
+			}, "<picture><source src=\"not-default.org\" type=\"image/png\" media=\"VALID_MEDIA\" sizes=\"VALID_SIZE\" srcset=\"VALID_SRCSET\"><img alt=\"IMAGE_ALT\" src=\"default.org\" type=\"image/png\" media=\"VALID_MEDIA\" sizes=\"VALID_SIZE\" srcset=\"VALID_SRCSET\"></picture>",
 		},
 	}
 

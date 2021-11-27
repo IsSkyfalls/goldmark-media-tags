@@ -5,6 +5,7 @@ import (
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/renderer"
 	"github.com/yuin/goldmark/util"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -111,7 +112,10 @@ func renderMedia(writer util.BufWriter, source []byte, n ast.Node, entering bool
 
 		_, _ = writer.WriteString(">")
 
-		//<source> tags
+		//<source> tags should be sorted
+		sort.SliceStable(v.Sources, func(i, j int) bool {
+			return v.Sources[j].IsDefault
+		})
 		for _, s := range v.Sources {
 			s.writeHTMLTag(writer, v)
 		}
@@ -140,6 +144,7 @@ type Source struct {
 	// Media for <picture>, experimental
 	Media string
 	// IsDefault only used for the default <img> inside <source>
+	// default sources will be moved to the last during rendering
 	IsDefault bool
 }
 
