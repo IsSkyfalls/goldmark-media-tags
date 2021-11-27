@@ -1,6 +1,7 @@
 package media
 
 import (
+	"fmt"
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/renderer"
 	"github.com/yuin/goldmark/util"
@@ -26,11 +27,18 @@ const (
 // Media represents an inline <video> or <audio> node in the ast
 type Media struct {
 	ast.BaseInline
-	Controls  bool
-	Autoplay  bool
-	Loop      bool
-	Muted     bool
-	Preload   string
+	//Controls for media only
+	Controls bool
+	//Autoplay for media only
+	Autoplay bool
+	//Loop for media only
+	Loop bool
+	//Muted for media only
+	Muted bool
+	//Preload for media only
+	Preload string
+	//Alt for <img> inside <picture>
+	Alt       string
 	MediaType Type
 	Sources   Sources
 }
@@ -56,6 +64,10 @@ func (n Media) Playable() bool {
 	return n.MediaType == Video || n.MediaType == Audio
 }
 
+func (n Media) IsPicture() bool {
+	return n.MediaType == Picture
+}
+
 // mediaHTMLRenderer implements rendering for Media nodes
 type mediaHTMLRenderer struct {
 }
@@ -76,6 +88,8 @@ func renderMedia(writer util.BufWriter, source []byte, n ast.Node, entering bool
 			_, _ = writer.WriteString("<audio")
 		case Picture:
 			_, _ = writer.WriteString("<picture")
+		default:
+			return ast.WalkContinue, fmt.Errorf("invalid media type %b", v.MediaType)
 		}
 		if v.Playable() {
 			if v.Controls {
@@ -99,7 +113,7 @@ func renderMedia(writer util.BufWriter, source []byte, n ast.Node, entering bool
 
 		//<source> tags
 		for _, s := range v.Sources {
-			s.writeHTMLTag(writer)
+			s.writeHTMLTag(writer, v)
 		}
 		//closing
 		switch v.MediaType {
@@ -115,14 +129,18 @@ func renderMedia(writer util.BufWriter, source []byte, n ast.Node, entering bool
 	return ast.WalkSkipChildren, nil
 }
 
-// Source represents the <source> element
+// Source represents the <source> element, or the fallback <img> inside <picture>
 // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/source#attributes
 type Source struct {
-	Src    string
-	Media  string
-	Sizes  string
-	Type   string
+	Src   string
+	Sizes string
+	Type  string
+	// SrcSet for <picture>, experimental
 	SrcSet string
+	// Media for <picture>, experimental
+	Media string
+	// IsDefault only used for the default <img> inside <source>
+	IsDefault bool
 }
 
 type Sources []Source
@@ -135,22 +153,34 @@ func (s Sources) String() string {
 	return strings.Join(sources, ",")
 }
 
-func (s Source) writeHTMLTag(writer util.BufWriter) {
-	_, _ = writer.WriteString("<source")
-	if s.Media != "" {
-		_, _ = writer.WriteString(" media=\"" + s.Media + "\"")
+func (s Source) writeHTMLTag(writer util.BufWriter, parent *Media) {
+	if s.IsDefault && parent.IsPicture() {
+		_, _ = writer.WriteString("<img")
+		if parent.Alt != "" {
+			_, _ = writer.WriteString(" alt=\"" + parent.Alt + "\"")
+		}
+	} else {
+		_, _ = writer.WriteString("<source")
 	}
-	if s.Sizes != "" {
-		_, _ = writer.WriteString(" sizes=\"" + s.Sizes + "\"")
-	}
+
 	if s.Src != "" {
 		_, _ = writer.WriteString(" src=\"" + s.Src + "\"")
 	}
-	if s.SrcSet != "" {
-		_, _ = writer.WriteString(" srcset=\"" + s.SrcSet + "\"")
-	}
 	if s.Type != "" {
 		_, _ = writer.WriteString(" type=\"" + s.Type + "\"")
+	}
+
+	if parent.IsPicture() {
+		// these only works on when <source> is inside <picture>
+		if s.Media != "" && parent.IsPicture() {
+			_, _ = writer.WriteString(" media=\"" + s.Media + "\"")
+		}
+		if s.Sizes != "" && parent.IsPicture() {
+			_, _ = writer.WriteString(" sizes=\"" + s.Sizes + "\"")
+		}
+		if s.SrcSet != "" && parent.IsPicture() {
+			_, _ = writer.WriteString(" srcset=\"" + s.SrcSet + "\"")
+		}
 	}
 	_, _ = writer.WriteString(">")
 }

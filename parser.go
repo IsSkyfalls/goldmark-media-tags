@@ -22,7 +22,7 @@ func (p mediaParser) Parse(parent ast.Node, block text.Reader, pc parser.Context
 	match := block.FindSubMatch(regex)
 	if len(match) > 0 {
 		flag := (Type)(match[1][0]) // one character only
-		//alt := string(match[2])
+		alt := string(match[2])
 		url := string(match[3])
 		if flag == Video || flag == Audio || flag == Picture {
 			return &Media{
@@ -32,10 +32,11 @@ func (p mediaParser) Parse(parent ast.Node, block text.Reader, pc parser.Context
 				Loop:       p.MediaLoop,
 				Preload:    p.MediaPreload,
 				Muted:      p.MediaMuted,
+				Alt:        alt,
 				MediaType:  flag,
 				Sources: []Source{{
-					Src:  url,
-					Type: "",
+					Src:       url,
+					IsDefault: true,
 				}},
 			}
 		} else {
