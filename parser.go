@@ -24,24 +24,22 @@ func (p mediaParser) Parse(parent ast.Node, block text.Reader, pc parser.Context
 		flag := (Type)(match[1][0]) // one character only
 		alt := string(match[2])
 		url := string(match[3])
-		if flag == Video || flag == Audio || flag == Picture {
-			return &Media{
-				BaseInline: ast.BaseInline{},
-				Controls:   p.MediaControls,
-				Autoplay:   p.MediaAutoplay,
-				Loop:       p.MediaLoop,
-				Preload:    p.MediaPreload,
-				Muted:      p.MediaMuted,
-				Alt:        alt,
-				MediaType:  flag,
-				Sources: []Source{{
-					Src:       url,
-					IsDefault: true,
-				}},
-			}
-		} else {
+
+		init, isValid := tagInitsLUT[flag]
+		if !isValid {
 			block.Advance(1)
+			return nil
 		}
+		media := Media{
+			BaseInline: ast.BaseInline{},
+			MediaType:  flag,
+			Alt:        alt,
+			Link:       url,
+		}
+		init.initAttributes(&media, p.Options)
+		source := init.makeSourceTag(media, p.Options)
+		media.AppendChild(&media, source)
+		parent.AppendChild(parent, &media)
 	}
 	return nil
 }

@@ -1,10 +1,10 @@
 module github.com/IsSkyfalls/goldmark-media-tags
 
-go 1.17
+go 1.18
 
 require (
 	github.com/stretchr/testify v1.7.0
-	github.com/yuin/goldmark v1.4.4
+	github.com/yuin/goldmark v1.4.14
 )
 
 require (
