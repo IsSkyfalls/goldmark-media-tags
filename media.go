@@ -1,8 +1,10 @@
 package media
 
 import (
+	"errors"
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/renderer"
+	"github.com/yuin/goldmark/util"
 )
 
 type Type byte
@@ -109,7 +111,7 @@ func (t *TagSourceSource) updateAttributes() {
 // Dump implements ast.Node.Dump
 func (t TagSourceSource) Dump(source []byte, level int) {
 	t.updateAttributes()
-	DumpAttributes(&t, source, level)
+	dumpAttributes(&t, source, level)
 }
 
 var kindImg = ast.NewNodeKind("MediaSourceImage")
@@ -127,7 +129,7 @@ func (t *TagSourceImg) updateAttributes() {
 // Dump implements ast.Node.Dump
 func (t TagSourceImg) Dump(source []byte, level int) {
 	t.updateAttributes()
-	DumpAttributes(&t, source, level)
+	dumpAttributes(&t, source, level)
 }
 
 // Media represents an inline <video>, <audio> or <picture> node
@@ -147,7 +149,7 @@ func (n *Media) Kind() ast.NodeKind {
 
 // Dump implements Node.Dump
 func (n *Media) Dump(source []byte, level int) {
-	DumpAttributes(n, source, level)
+	dumpAttributes(n, source, level)
 }
 
 func (n *Media) Text(source []byte) []byte {
@@ -159,5 +161,21 @@ type mediaHTMLRenderer struct {
 }
 
 func (v mediaHTMLRenderer) RegisterFuncs(registerer renderer.NodeRendererFuncRegisterer) {
-	registerer.Register(kindMedia, nil)
+	registerer.Register(kindMedia, renderMediaTag)
+}
+
+func renderMediaTag(writer util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+	if media, ok := n.(*Media); ok {
+		init, validTag := tagInitsLUT[media.MediaType]
+		if !validTag {
+			return ast.WalkSkipChildren, errors.New("invalid media type")
+		}
+		if entering {
+			writer.WriteString(renderTagWithAttributesNoClosing(n, init.tagName()))
+			return ast.WalkContinue, nil
+		}
+		writer.WriteString("</" + init.tagName() + ">")
+		return ast.WalkContinue, nil
+	}
+	return ast.WalkSkipChildren, errors.New("invalid tag")
 }

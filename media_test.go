@@ -1,6 +1,10 @@
 package media
 
 import (
+	"bytes"
+	"fmt"
+	"github.com/stretchr/testify/assert"
+	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/ast"
 	"testing"
 )
@@ -29,4 +33,10 @@ func TestMedia_Dump(t *testing.T) {
 	media.AppendChild(&media, source1)
 
 	media.Dump([]byte{}, 0)
+
+	md := goldmark.New(goldmark.WithExtensions(Extension{}))
+	buf := bytes.NewBuffer([]byte{})
+	err := md.Renderer().Render(buf, []byte{}, &media)
+	assert.NoError(t, err)
+	fmt.Println(buf.String())
 }
