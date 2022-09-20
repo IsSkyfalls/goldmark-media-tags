@@ -20,9 +20,14 @@ const (
 	AttrPreload       = "preload"
 )
 
+// every tag should be a namedTag
+type namedTag interface {
+	tagName() string
+}
+
 // tagInit is a helper type to create and initialize a Media tag
 type tagInit interface {
-	tagName() string
+	namedTag
 	// makeSourceTag initializes attributes on the parent tag
 	initAttributes(parent *Media, options Options)
 	// makeSourceTag creates a <source> tag for the parent element, for the first children of <picture>, an <img> tag will be created
@@ -72,7 +77,7 @@ func (t tagVideoAndAudioInit) initAttributes(parent *Media, options Options) {
 func (t tagVideoAndAudioInit) makeSourceTag(parent Media, options Options) ast.Node {
 	tag := TagSourceSource{}
 	if parent.ChildCount() == 0 {
-		tag.SetAttributeString("src", parent.Link)
+		tag.Src = parent.Link
 	}
 	return &tag
 }
@@ -83,14 +88,21 @@ var tagInitsLUT = map[Type]tagInit{
 	TypeVideo:   tagVideoAndAudioInit{"video"},
 }
 
+// TagSourceImg and TagSourceSource should be attributed
+type attributed interface {
+	updateAttributes()
+}
+
 type TagSourceImg struct {
 	ast.BaseInline
+	namedTag
 	Src string
 	Alt string
 }
 
 type TagSourceSource struct {
 	ast.BaseInline
+	namedTag
 	Src string
 	// SrcSet is only used in <picture>s
 	SrcSet string
@@ -101,6 +113,10 @@ var kindSource = ast.NewNodeKind("MediaSourceSource")
 // Kind implements ast.Node.Kind
 func (t TagSourceSource) Kind() ast.NodeKind {
 	return kindSource
+}
+
+func (t TagSourceSource) tagName() string {
+	return "source"
 }
 
 func (t *TagSourceSource) updateAttributes() {
@@ -119,6 +135,10 @@ var kindImg = ast.NewNodeKind("MediaSourceImage")
 // Kind implements ast.Node.Kind
 func (t TagSourceImg) Kind() ast.NodeKind {
 	return kindImg
+}
+
+func (t TagSourceImg) tagName() string {
+	return "img"
 }
 
 func (t *TagSourceImg) updateAttributes() {
@@ -162,6 +182,17 @@ type mediaHTMLRenderer struct {
 
 func (v mediaHTMLRenderer) RegisterFuncs(registerer renderer.NodeRendererFuncRegisterer) {
 	registerer.Register(kindMedia, renderMediaTag)
+	registerer.Register(kindSource, renderSourceTag)
+	registerer.Register(kindImg, renderSourceTag)
+}
+
+func renderSourceTag(writer util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+	if entering {
+		n.(attributed).updateAttributes()
+		writer.WriteString(renderTagWithAttributes(n, n.(namedTag).tagName()))
+		return ast.WalkSkipChildren, nil
+	}
+	return ast.WalkSkipChildren, nil
 }
 
 func renderMediaTag(writer util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
