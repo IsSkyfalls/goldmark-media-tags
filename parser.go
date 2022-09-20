@@ -7,7 +7,7 @@ import (
 	"regexp"
 )
 
-var regex = regexp.MustCompile(`!(.)\[(.*?)]\((.+?)\)`)
+var regex = regexp.MustCompile(`^!(.)\[(.*?)]\((.+?)\)`) // only from the trigger position by prepending ^
 
 // mediaParser implements parser.InlineParser interface
 type mediaParser struct {
@@ -40,6 +40,8 @@ func (p mediaParser) Parse(parent ast.Node, block text.Reader, pc parser.Context
 		source := init.makeSourceTag(media, p.Options)
 		media.AppendChild(&media, source)
 		parent.AppendChild(parent, &media)
+		return &media
 	}
+	block.Advance(1)
 	return nil
 }
