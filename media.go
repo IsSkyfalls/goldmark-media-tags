@@ -189,7 +189,7 @@ func (v mediaHTMLRenderer) RegisterFuncs(registerer renderer.NodeRendererFuncReg
 func renderSourceTag(writer util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		n.(attributed).updateAttributes()
-		writer.WriteString(renderTagWithAttributes(n, n.(namedTag).tagName()))
+		writer.WriteString(renderTagWithAttributesSelfClose(n, n.(namedTag).tagName()))
 		return ast.WalkSkipChildren, nil
 	}
 	return ast.WalkSkipChildren, nil
@@ -203,6 +203,7 @@ func renderMediaTag(writer util.BufWriter, source []byte, n ast.Node, entering b
 		}
 		if entering {
 			writer.WriteString(renderTagWithAttributesNoClosing(n, init.tagName()))
+			writer.WriteString(">")
 			return ast.WalkContinue, nil
 		}
 		writer.WriteString("</" + init.tagName() + ">")

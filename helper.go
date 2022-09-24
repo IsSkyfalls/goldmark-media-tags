@@ -20,9 +20,13 @@ func dumpAttributes(n ast.Node, source []byte, level int) {
 	}
 	ast.DumpHelper(n, source, level, list, nil)
 }
-func renderTagWithAttributes(n ast.Node, tagName string) string {
-	return renderTagWithAttributesNoClosing(n, tagName) + "</" + tagName + ">"
+
+// renderTagWithAttributesNoClosing will render a self-closing tag ending in />
+func renderTagWithAttributesSelfClose(n ast.Node, tagName string) string {
+	return renderTagWithAttributesNoClosing(n, tagName) + " />"
 }
+
+// renderTagWithAttributesNoClosing will render a tag without closing it with >
 func renderTagWithAttributesNoClosing(n ast.Node, tagName string) string {
 	attrs := n.Attributes()
 	sort.Slice(attrs, func(i, j int) bool {
@@ -49,6 +53,5 @@ func renderTagWithAttributesNoClosing(n ast.Node, tagName string) string {
 		html += " " + string(e.Name)
 		html += "=\"" + string(util.EscapeHTML([]byte(escaped))) + "\""
 	}
-	html += ">"
 	return html
 }
