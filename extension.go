@@ -8,15 +8,15 @@ import (
 )
 
 type Options struct {
-	//MediaControls default is true, affects <audio> and <video>
+	// MediaControls default is true, affects <audio> and <video>
 	MediaControls bool
-	//MediaAutoplay default is false, affects <audio> and <video>
+	// MediaAutoplay default is false, affects <audio> and <video>
 	MediaAutoplay bool
-	//MediaLoop default is false, affects <audio> and <video>
+	// MediaLoop default is false, affects <audio> and <video>
 	MediaLoop bool
-	//MediaMuted default is false, affects <audio> and <video>
+	// MediaMuted default is false, affects <audio> and <video>
 	MediaMuted bool
-	//MediaPreload default is empty, check Preload. Affects <audio> and <video>
+	// MediaPreload default is empty string(""). Affects <audio> and <video>
 	MediaPreload string
 }
 

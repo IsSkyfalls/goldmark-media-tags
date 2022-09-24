@@ -27,7 +27,7 @@ func TestExtensionWithOptions(t *testing.T) {
 			MediaAutoplay: true,
 			MediaLoop:     true,
 			MediaMuted:    true,
-			MediaPreload:  Metadata,
+			MediaPreload:  "",
 		}),
 	))
 	src := []byte(`
