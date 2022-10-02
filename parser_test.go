@@ -13,10 +13,10 @@ func TestParse(t *testing.T) {
 		str   string
 		_type ast.NodeKind
 	}{
-		{"!v[video](https://example.org/test.mp4)", kindMedia},
-		{"!a[audio](https://example.org/test.mp3)", kindMedia},
-		{"!p[picture](https://example.org/test.png)", kindMedia},
-		{"!v[](https://example.org/test.mp4)", kindMedia}, //no alt text, still valid
+		{"!v[video](https://example.org/test.mp4)", KindMedia},
+		{"!a[audio](https://example.org/test.mp3)", KindMedia},
+		{"!p[picture](https://example.org/test.png)", KindMedia},
+		{"!v[](https://example.org/test.mp4)", KindMedia}, //no alt text, still valid
 		{"!v[test]()", ast.KindText},                      //no url
 		{"!x[test](1)", ast.KindText},                     //wrong type
 	}

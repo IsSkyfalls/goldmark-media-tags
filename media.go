@@ -93,6 +93,11 @@ type attributed interface {
 	updateAttributes()
 }
 
+type HasSrc interface {
+	GetSrc() string
+	SetSrc(src string)
+}
+
 type TagSourceImg struct {
 	ast.BaseInline
 	namedTag
@@ -108,11 +113,11 @@ type TagSourceSource struct {
 	SrcSet string
 }
 
-var kindSource = ast.NewNodeKind("MediaSourceSource")
+var KindSource = ast.NewNodeKind("MediaSourceSource")
 
 // Kind implements ast.Node.Kind
 func (t TagSourceSource) Kind() ast.NodeKind {
-	return kindSource
+	return KindSource
 }
 
 func (t TagSourceSource) tagName() string {
@@ -124,17 +129,25 @@ func (t *TagSourceSource) updateAttributes() {
 	t.SetAttributeString("srcset", t.SrcSet)
 }
 
+func (t TagSourceSource) GetSrc() string {
+	return t.Src
+}
+
+func (t *TagSourceSource) SetSrc(src string) {
+	t.Src = src
+}
+
 // Dump implements ast.Node.Dump
 func (t TagSourceSource) Dump(source []byte, level int) {
 	t.updateAttributes()
 	dumpAttributes(&t, source, level)
 }
 
-var kindImg = ast.NewNodeKind("MediaSourceImage")
+var KindImg = ast.NewNodeKind("MediaSourceImage")
 
 // Kind implements ast.Node.Kind
 func (t TagSourceImg) Kind() ast.NodeKind {
-	return kindImg
+	return KindImg
 }
 
 func (t TagSourceImg) tagName() string {
@@ -144,6 +157,14 @@ func (t TagSourceImg) tagName() string {
 func (t *TagSourceImg) updateAttributes() {
 	t.SetAttributeString("src", t.Src)
 	t.SetAttributeString("alt", t.Alt)
+}
+
+func (t TagSourceImg) GetSrc() string {
+	return t.Src
+}
+
+func (t *TagSourceImg) SetSrc(src string) {
+	t.Src = src
 }
 
 // Dump implements ast.Node.Dump
@@ -160,11 +181,11 @@ type Media struct {
 	Link      string
 }
 
-var kindMedia = ast.NewNodeKind("MediaParent")
+var KindMedia = ast.NewNodeKind("MediaParent")
 
 // Kind implements Node.Kind
 func (n *Media) Kind() ast.NodeKind {
-	return kindMedia
+	return KindMedia
 }
 
 // Dump implements Node.Dump
@@ -181,9 +202,9 @@ type mediaHTMLRenderer struct {
 }
 
 func (v mediaHTMLRenderer) RegisterFuncs(registerer renderer.NodeRendererFuncRegisterer) {
-	registerer.Register(kindMedia, renderMediaTag)
-	registerer.Register(kindSource, renderSourceTag)
-	registerer.Register(kindImg, renderSourceTag)
+	registerer.Register(KindMedia, renderMediaTag)
+	registerer.Register(KindSource, renderSourceTag)
+	registerer.Register(KindImg, renderSourceTag)
 }
 
 func renderSourceTag(writer util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
