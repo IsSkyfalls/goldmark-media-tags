@@ -17,5 +17,5 @@ func TestAttributeEscape(t *testing.T) {
 	tag.SetAttributeString("bytes", []byte("bytes 統一碼<"))
 	tag.updateAttributes()
 	s := renderTagWithAttributesNoClosing(tag, "source")
-	assert.Equal(t, "<source src=\"&amp;quot;'&amp;gt;,&amp;lt;\" enabled bytes=\"bytes 統一碼&amp;lt;\">", s)
+	assert.Equal(t, "<source src=\"&amp;quot;'&amp;gt;,&amp;lt;\" enabled bytes=\"bytes 統一碼&amp;lt;\"", s)
 }

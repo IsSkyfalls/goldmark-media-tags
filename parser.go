@@ -19,7 +19,7 @@ func (p mediaParser) Trigger() []byte {
 }
 
 func (p mediaParser) Parse(parent ast.Node, block text.Reader, pc parser.Context) ast.Node {
-	match := block.FindSubMatch(regex)
+	match := MatchAndAdvance(block, regex)
 	if len(match) > 0 {
 		flag := (Type)(match[1][0]) // one character only
 		alt := string(match[2])
@@ -44,4 +44,23 @@ func (p mediaParser) Parse(parent ast.Node, block text.Reader, pc parser.Context
 	}
 	block.Advance(1)
 	return nil
+}
+
+func MatchAndAdvance(reader text.Reader, reg *regexp.Regexp) []string {
+	// workaround: block.FindSubMatch spits out completely wrong values when provided with unicode characters
+	oldline, oldseg := reader.Position()
+	matches := reg.FindReaderSubmatchIndex(reader)
+	if matches == nil {
+		return nil
+	}
+	reader.SetPosition(oldline, oldseg)
+	segments := make([]string, 0, len(matches)/2)
+	line, _ := reader.PeekLine()
+
+	for i := 0; i < len(matches)/2; i++ {
+		s := line[matches[i*2]:matches[i*2+1]]
+		segments = append(segments, string(s))
+	}
+	reader.Advance(matches[1])
+	return segments
 }
