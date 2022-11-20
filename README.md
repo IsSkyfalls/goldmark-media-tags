@@ -9,12 +9,14 @@ flexmark-java [\<flexmark-ext-media-tags\>](https://github.com/vsch/flexmark-jav
 
 ## Supports
 
-`<media>`, `<audio>` and `<picture>.
+`<media>`, `<audio>`, `<picture>`, `<iframe>` and `<embed>`.
 
 ```markdown
 !v[This is a video](https://example.org/test.webm)
 !a[And this is an audio](https://example.org/test.mp3)
 !p[And this a picture](https://example.org/test.png)
+!i[And this an iframe](https://example.org/frame.html)
+!e[And this an embed](https://example.org/embed.svg)
 ```
 
 Renders to:
@@ -31,6 +33,8 @@ Renders to:
     <picture>
         <img alt="And this a picture" src="https://example.org/test.png">
     </picture>
+    <iframe src="https://example.org/frame.html"></iframe>
+    <embed src="https://example.org/embed.svg"></embed>
 </p>
 ```
 
