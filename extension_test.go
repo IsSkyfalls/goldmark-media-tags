@@ -15,6 +15,8 @@ func TestExtensionWithDefaults(t *testing.T) {
 !v[Train火车](https://upload.wikimedia.org/wikipedia/commons/5/5d/KkStB_Class_310.webm)
 !a[THE Anthem国歌](https://upload.wikimedia.org/wikipedia/commons/transcoded/5/59/State_Anthem_of_the_Soviet_Union_%281984%29.wav/State_Anthem_of_the_Soviet_Union_%281984%29.wav.mp3)
 !p[Blossoms花朵](https://upload.wikimedia.org/wikipedia/commons/b/b8/Blossoming-Blackberries-P1400842_%2837396534302%29.jpg)
+!i[Anything here](https://example.com/frame.html)
+!e[Anything here](https://example.com/class.svg)
 `)
 	err := md.Convert(src, os.Stdout)
 	assert.NoError(t, err)

@@ -13,6 +13,8 @@ const (
 	TypePicture  Type = 'p'
 	TypeVideo    Type = 'v'
 	TypeAudio    Type = 'a'
+	TypeIFrame   Type = 'i'
+	TypeEmbed    Type = 'e'
 	AttrControls      = "controls"
 	AttrAutoplay      = "autoplay"
 	AttrLoop          = "loop"
@@ -82,10 +84,29 @@ func (t tagVideoAndAudioInit) makeSourceTag(parent Media, options Options) ast.N
 	return &tag
 }
 
+// tagEmbedInit is the initializer for <iframe>
+type tagEmbedInit struct {
+	name string
+}
+
+func (t tagEmbedInit) tagName() string {
+	return t.name
+}
+
+func (t tagEmbedInit) initAttributes(parent *Media, options Options) {
+	parent.SetAttributeString("src", parent.Link)
+}
+
+func (t tagEmbedInit) makeSourceTag(parent Media, options Options) ast.Node {
+	return nil // iframe should not have any children
+}
+
 var tagInitsLUT = map[Type]tagInit{
 	TypePicture: tagPictureInit{},
 	TypeAudio:   tagVideoAndAudioInit{name: "audio"},
 	TypeVideo:   tagVideoAndAudioInit{"video"},
+	TypeIFrame:  tagEmbedInit{"iframe"},
+	TypeEmbed:   tagEmbedInit{"embed"},
 }
 
 // TagSourceImg and TagSourceSource should be attributed

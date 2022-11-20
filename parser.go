@@ -38,7 +38,10 @@ func (p mediaParser) Parse(parent ast.Node, block text.Reader, pc parser.Context
 		}
 		init.initAttributes(&media, p.Options)
 		source := init.makeSourceTag(media, p.Options)
-		media.AppendChild(&media, source)
+		if source != nil {
+			// embeds have no children
+			media.AppendChild(&media, source)
+		}
 		parent.AppendChild(parent, &media)
 		return &media
 	}
